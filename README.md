@@ -21,7 +21,7 @@ npm test            # parser + report-abuse unit tests
 
 ## Go live
 
-1. **Supabase**: create a project. In the SQL editor run `supabase/migrations/001_schema.sql`, then `supabase/seed.sql`.
+1. **Supabase**: create a project. In the SQL editor run `supabase/migrations/001_schema.sql` (the only schema file), then `supabase/seed.sql`.
    Auth → URL configuration: add `https://YOUR_DOMAIN/auth/callback` as a redirect URL. Email (magic link) auth is used.
 2. `cp .env.example .env.local` and fill in values. Generate secrets: `openssl rand -hex 32` (CRON_SECRET, REPORTER_HASH_SALT); VAPID keys: `npx web-push generate-vapid-keys`.
 3. Sign in once via `/login`, then make yourself admin:
