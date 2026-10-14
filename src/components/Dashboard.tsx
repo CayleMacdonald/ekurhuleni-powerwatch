@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { SOURCE_KIND_LABEL, STATUS_META, STATUS_ORDER } from "@/lib/constants";
+import { SOURCE_KIND_LABEL, STATUS_META, STATUS_ORDER, WITFIELD } from "@/lib/constants";
 import { loadAreas, type MyArea } from "@/lib/areas-store";
 import { haversineKm } from "@/lib/geo";
 import { outageDurationMs } from "@/lib/time";
@@ -26,7 +26,7 @@ function inMyAreas(o: Outage, areas: MyArea[]) {
   });
 }
 
-export function Dashboard({ outages, demo, lastSourceCheck, error, title, initialScope = "active" }: { outages: Outage[]; demo: boolean; lastSourceCheck?: string | null; error?: string; title?: string; initialScope?: Scope }) {
+export function Dashboard({ outages, demo, lastSourceCheck, error, title, initialScope = "active", showWitfieldCard = true }: { outages: Outage[]; demo: boolean; lastSourceCheck?: string | null; error?: string; title?: string; initialScope?: Scope; showWitfieldCard?: boolean }) {
   const [q, setQ] = useState("");
   const [scope, setScope] = useState<Scope>(initialScope);
   const [src, setSrc] = useState<"all" | SourceKind>("all");
@@ -60,6 +60,16 @@ export function Dashboard({ outages, demo, lastSourceCheck, error, title, initia
       .sort((a, b) => Number(b.mine) - Number(a.mine) || Number(a.o.status === "restored") - Number(b.o.status === "restored") || b.o.updated_at.localeCompare(a.o.updated_at));
   }, [outages, q, scope, src, minHours, verifiedOnly, areas]);
 
+  // Witfield summary appears only when the search text is about Witfield / Ward 22.
+  const witfieldSearch = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    return showWitfieldCard && t.length >= 3 && (t.includes("witfield") || /^ward\s*22$/.test(t) || t === "22");
+  }, [q, showWitfieldCard]);
+  const witfieldOutages = useMemo(
+    () => outages.filter((o) => o.suburbs.some((s) => s.toLowerCase() === "witfield") || o.ward === WITFIELD.ward),
+    [outages],
+  );
+  const witfieldActive = witfieldOutages.filter((o) => o.status !== "restored").length;
   const activeCount = outages.filter((o) => o.status !== "restored").length;
   const counts = STATUS_ORDER.map((s) => ({ s, n: outages.filter((o) => o.status === s).length }));
 
@@ -118,6 +128,26 @@ export function Dashboard({ outages, demo, lastSourceCheck, error, title, initia
         </label>
         </div>
       </section>
+
+      {witfieldSearch && (
+        <section aria-label="Witfield, Boksburg, Ward 22" className="card flex flex-wrap items-center justify-between gap-3 border-l-4 border-gold-500 p-4">
+          <div>
+            <h2 className="text-lg font-extrabold text-brand-900">Witfield, Boksburg · Ward {WITFIELD.ward}</h2>
+            <p className="text-sm text-slate-700" aria-live="polite">
+              {witfieldActive > 0
+                ? `${witfieldActive} active outage${witfieldActive === 1 ? "" : "s"} recorded for this area.`
+                : demo
+                  ? "No active demo outage for Witfield."
+                  : "No active outage is currently recorded for Witfield. This reflects what sources and residents have reported – not a guarantee."}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link className="btn-primary" href="/witfield">Full Witfield view &amp; history</Link>
+            <Link className="btn-ghost" href="/settings?suburb=Witfield&ward=22">Get alerts</Link>
+            <Link className="btn-ghost" href="/report?suburb=Witfield&ward=22">Report an outage</Link>
+          </div>
+        </section>
+      )}
 
       <div className="flex gap-2 lg:hidden" role="tablist" aria-label="View">
         {(["list", "map"] as const).map((t) => (

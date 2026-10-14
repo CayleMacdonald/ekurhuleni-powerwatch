@@ -30,7 +30,7 @@ export default async function WitfieldPage() {
           <Link className="btn-ghost" href="/report?suburb=Witfield&ward=22">Report an outage</Link>
         </div>
       </section>
-      <Dashboard outages={mine} demo={feed.demo} lastSourceCheck={feed.lastSourceCheck} error={feed.error} initialScope="all" />
+      <Dashboard outages={mine} demo={feed.demo} lastSourceCheck={feed.lastSourceCheck} error={feed.error} initialScope="all" showWitfieldCard={false} />
       <div>
         <h2 className="mb-3 text-xl font-bold">Witfield outage history</h2>
         <AnalyticsView a={computeAnalytics(mine)} demo={feed.demo} scopeLabel="Witfield" />
