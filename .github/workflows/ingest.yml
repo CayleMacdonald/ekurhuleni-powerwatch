@@ -1,0 +1,23 @@
+name: PowerWatch ingest
+
+# Free, reliable scheduler for the ingestion job (Vercel Hobby crons only run daily).
+# Add repository secrets: APP_URL (e.g. https://powerwatch.example.org) and CRON_SECRET.
+# The endpoint itself only fetches sources whose per-source interval has elapsed,
+# so running this every 5 minutes is safe even if sources are set to 15/30/60 minutes.
+
+# The schedule is DISABLED by default so it does not fail before you have configured it.
+# To enable automatic runs: add the repository secrets above, then uncomment the 3 lines below.
+on:
+  # schedule:
+  #   - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger ingestion
+        run: |
+          curl --fail --silent --show-error --max-time 120 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.APP_URL }}/api/cron/ingest"

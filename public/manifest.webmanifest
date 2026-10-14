@@ -1,0 +1,10 @@
+{
+  "name": "Ekurhuleni PowerWatch",
+  "short_name": "PowerWatch",
+  "description": "Live electricity outage and restoration updates for Ekurhuleni",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F7FA",
+  "theme_color": "#0B2D4F",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
