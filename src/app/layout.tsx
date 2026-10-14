@@ -13,7 +13,6 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 
 const NAV = [
   { href: "/", label: "Live map" },
-  { href: "/witfield", label: "Witfield · Ward 22" },
   { href: "/analytics", label: "Analytics" },
   { href: "/report", label: "Report outage" },
   { href: "/settings", label: "My alerts" },
